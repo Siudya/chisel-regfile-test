@@ -22,5 +22,5 @@ class RegFile[T <: Data](gen:T, set:Int, readPort:Int, writePort:Int) extends Mo
     val w = Vec(writePort, new WritePort(gen, set))
   })
   //TODO: Fill your codes here.
-  io.r.foreach(_.data := 0.U) //This line should be remove when fill your codes!
+  io.r.foreach(_.data := 0.U) //This line should be remove when filling your codes!
 }
