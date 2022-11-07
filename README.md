@@ -1,5 +1,5 @@
-# Chisel测试
-在这个仓库里你将使用完成一个寄存器堆（RegFile）的编写，生成RTL并做简单的验证。  
+# Chisel入门测试
+在这个仓库里你将使用Chisel完成一个寄存器堆（RegFile）的编写，生成RTL并做简单的验证。  
 请填写`src/main/scala/regfile/RegFile.scala`中`RegFile`模块的实现，模块的接口和参数均已给出，**不要修改它们**，否则测试可能无法正常进行。
 
 ---
