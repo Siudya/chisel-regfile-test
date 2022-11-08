@@ -47,8 +47,8 @@ object RegFileChiselTest {
       }
       dut.clock.step()
       for (rport <- r) {
-        rport.en.poke(false.B)
         rport.data.expect(scoreboard(idx).U)
+        rport.en.poke(false.B)
       }
       r.foreach(_.en.poke(false.B))
     }
