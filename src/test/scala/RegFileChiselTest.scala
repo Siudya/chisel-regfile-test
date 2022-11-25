@@ -60,10 +60,16 @@ object RegFileChiselTest {
     dut.io.r.indices.copyToArray(rportIdx)
     val wportIdx = Array[Int](dut.io.w.length)
     dut.io.w.indices.copyToArray(wportIdx)
+    val setIdx = Array[Int](scoreboard.length)
+    scoreboard.indices.copyToArray(setIdx)
+    val setIdxShuffled = MyUtil.shuffleArray(setIdx)
     val bypassReadPorts = MyUtil.shuffleArray(rportIdx).toSeq.slice(0,2)
     val bypassWritePorts = MyUtil.shuffleArray(wportIdx).toSeq.head
     val bypassData = nextInt(math.pow(2, dwidth).toInt)
     val bypassAddr = nextInt(scoreboard.length)
+    val regularReadPorts = rportIdx.slice(2,dut.io.r.length)
+    val regularReadAddrs = setIdxShuffled.filter(_ != bypassAddr).slice(0, regularReadPorts.length)
+    val regularReadPortsWithAddrs = (regularReadPorts zip regularReadAddrs).toMap
     for((w, idx) <- dut.io.w.zipWithIndex){
       val data = nextInt(math.pow(2, dwidth).toInt)
       w.data.poke(if(idx == bypassWritePorts) bypassData.U else data.U)
@@ -74,21 +80,31 @@ object RegFileChiselTest {
       }
     }
     for((r, idx) <- dut.io.r.zipWithIndex){
-      r.addr.poke(if(bypassReadPorts.contains(idx)) bypassAddr.U else 0.U)
-      r.en.poke(if(bypassReadPorts.contains(idx)) true.B else false.B)
+      val addr = if(bypassReadPorts.contains(idx)) {
+        bypassAddr.U
+      } else if(regularReadPorts.contains(idx)){
+        regularReadPortsWithAddrs(idx).U
+      } else {
+        0.U
+      }
+      r.addr.poke(addr)
+      r.en.poke(true.B)
     }
     dut.clock.step()
     for((r, idx) <- dut.io.r.zipWithIndex){
       if(bypassReadPorts.contains(idx)){
         r.data.expect(bypassData.U)
+      } else if(regularReadPorts.contains(idx)) {
+        r.data.expect(scoreboard(regularReadPortsWithAddrs(idx)).U)
       }
+      r.en.poke(false.B)
     }
   }
 }
 class RegFileChiselTest extends AnyFlatSpec with ChiselScalatestTester{
   behavior of "RegFile"
   val dataWidth = nextInt(64) + 1
-  val readPort = nextInt(10) + 2
+  val readPort = nextInt(10) + 3
   val writePort = nextInt(4) + 1
   val set = nextInt(128) + 1
 

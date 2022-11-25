@@ -16,7 +16,7 @@ trait MyCommonModule extends ScalaModule with SbtModule{
   override def scalaVersion = ivys.sv
   override def compileIvyDeps = Agg(ivys.macroParadise)
   override def scalacPluginIvyDeps = Agg(ivys.macroParadise, ivys.chisel3Plugin)
-  override def scalacOptions = Seq("-Xsource:2.11")
+  override def scalacOptions = Seq("-Xsource:2.11", "-language:reflectiveCalls")
   override def ivyDeps = Agg(ivys.chisel3, ivys.sourcecode)
 }
 
@@ -24,9 +24,7 @@ object RegFile extends MyCommonModule{
   override def moduleDeps = super.moduleDeps
   override def millSourcePath = os.pwd
 
-  object test extends Tests{
+  object test extends Tests with TestModule.ScalaTest{
     override def ivyDeps = super.ivyDeps() ++ Agg(ivys.scalatest, ivys.chiseltest)
-
-    def testFrameworks = Seq("org.scalatest.tools.Framework")
   }
 }
