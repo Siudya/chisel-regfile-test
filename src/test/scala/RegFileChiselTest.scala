@@ -47,10 +47,10 @@ object RegFileChiselTest {
       }
       dut.clock.step()
       for (rport <- r) {
-        rport.data.expect(scoreboard(idx).U)
+        rport.addr.poke(0.U)
         rport.en.poke(false.B)
+        rport.data.expect(scoreboard(idx).U)
       }
-      r.foreach(_.en.poke(false.B))
     }
   }
 
