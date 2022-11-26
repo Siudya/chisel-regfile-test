@@ -92,12 +92,13 @@ object RegFileChiselTest {
     }
     dut.clock.step()
     for((r, idx) <- dut.io.r.zipWithIndex){
+      r.addr.poke(0.U)
+      r.en.poke(false.B)
       if(bypassReadPorts.contains(idx)){
         r.data.expect(bypassData.U)
       } else if(regularReadPorts.contains(idx)) {
         r.data.expect(scoreboard(regularReadPortsWithAddrs(idx)).U)
       }
-      r.en.poke(false.B)
     }
   }
 }
